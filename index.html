@@ -1,0 +1,86 @@
+# 1. Create repo Challenge
+mkdir Challenge && cd Challenge && git init
+
+# 2. Create index.html and paste this code between <html>...</html>
+cat > index.html <<'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Honey Bakers Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body{margin:0;font-family:sans-serif;background:#fff8f0}
+    .app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+    .sidebar{background:#f7c04a;padding:20px;color:#fff}
+    .sidebar a{display:block;margin:8px 0;color:#fff;text-decoration:none}
+    .main{padding:20px;display:flex;flex-direction:column;gap:20px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px}
+    .card{background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+    .charts{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+    .panel{background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}
+    @media(max-width:800px){.app{grid-template-columns:1fr}.charts{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <h2>🍯 Honey Bakers</h2>
+      <a href="#">Dashboard</a><a href="#">Orders</a><a href="#">Products</a><a href="#">Customers</a>
+    </aside>
+    <main class="main">
+      <h1>Dashboard</h1>
+      <div class="cards">
+        <div class="card"><h3>Orders</h3><p>1240</p></div>
+        <div class="card"><h3>Revenue</h3><p>$8,450</p></div>
+        <div class="card"><h3>Customers</h3><p>560</p></div>
+        <div class="card"><h3>Pending</h3><p>32</p></div>
+      </div>
+      <div class="charts">
+        <div class="panel"><h3>Orders Trend</h3><canvas id="lineChart"></canvas></div>
+        <div class="panel"><h3>Categories</h3><canvas id="pieChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3>Recent Orders</h3>
+        <table>
+          <thead><tr><th>ID</th><th>Customer</th><th>Item</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>#101</td><td>Alice</td><td>Chocolate Cake</td><td>Delivered</td></tr>
+            <tr><td>#102</td><td>Bob</td><td>Croissant</td><td>Pending</td></tr>
+            <tr><td>#103</td><td>Carla</td><td>Birthday Cake</td><td>Delivered</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+  <script>
+    new Chart(document.getElementById('lineChart'),{
+      type:'line',
+      data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets:[{label:'Orders',data:[120,150,180,170,200,220,190],
+        borderColor:'#f7c04a',backgroundColor:'rgba(247,192,74,0.2)',fill:true,tension:0.3}]}
+    });
+    new Chart(document.getElementById('pieChart'),{
+      type:'pie',
+      data:{labels:['Cakes','Pastries','Bread','Cookies'],
+        datasets:[{data:[45,25,20,10],backgroundColor:['#f7c04a','#ffb703','#fb8500','#e36414']}]}
+    });
+  </script>
+</body>
+</html>
+EOF
+
+# 3. Commit & push to GitHub (replace USERNAME)
+git add index.html
+git commit -m "Add Honey Bakers dashboard"
+git branch -M main
+git remote add origin https://github.com/USERNAME/Challenge.git
+git push -u origin main
+
+# 4. Deploy (Automatic via GitHub Pages)
+# → On GitHub repo: Settings > Pages > Source = main / (root)
+# → Get URL: https://USERNAME.github.io/Challenge/
+  
