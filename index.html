@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Honey Medico — Dashboard</title>
+  <meta name="description" content="Honey Medico dashboard — supply medical items & run 1-hour tests" />
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#94a3b8; --accent:#ffc857; --accent-2:#7bd389;
+      --glass: rgba(255,255,255,0.03);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071021 0%,#071827 100%);color:#e6eef8}
+    .wrap{display:grid;grid-template-columns:260px 1fr;gap:20px;min-height:100vh;padding:28px}
+    header.top{position:fixed;left:260px;right:28px;top:16px;height:56px;display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--glass);backdrop-filter: blur(6px);border-radius:12px;border:1px solid rgba(255,255,255,0.04)}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#ff7a7a);display:flex;align-items:center;justify-content:center;font-weight:700;color:#082;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
+    .sidebar{padding:20px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:14px;border:1px solid rgba(255,255,255,0.03);height:calc(100vh - 56px - 56px);margin-top:56px}
+    nav .nav-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;color:var(--muted);cursor:pointer}
+    nav .nav-item:hover{background:rgba(255,255,255,0.02);color:#fff}
+    .content{padding-top:88px;padding-left:12px;padding-right:28px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px}
+    .card{background:var(--card);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .card h3{margin:0 0 8px 0}
+    .stat{font-size:28px;font-weight:700}
+    .small{color:var(--muted);font-size:13px}
+    .row{display:flex;gap:18px}
+    .wide{grid-column:span 2}
+    table{width:100%;border-collapse:collapse}
+    table td, table th{padding:10px;border-bottom:1px dashed rgba(255,255,255,0.03);text-align:left}
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),#ff7a7a);color:#082;font-weight:600;text-decoration:none}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);font-weight:600}
+    .urgent{background:linear-gradient(90deg,#ff7a7a,#ffb199);color:#081}
+    /* responsive */
+    @media(max-width:980px){.wrap{grid-template-columns:1fr}header.top{left:18px;right:18px} .sidebar{display:none} .grid{grid-template-columns:repeat(1,1fr)} .wide{grid-column:span 1}}
+    /* tiny chart */
+    .spark{width:100%;height:60px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="brand">
+        <div class="logo">HM</div>
+        <div>
+          <div style="font-weight:700">Honey Medico</div>
+          <div class="small">Supply · 1-hour tests</div>
+        </div>
+      </div>
+      <hr style="margin:14px 0;border:none;border-top:1px solid rgba(255,255,255,0.02)" />
+      <nav>
+        <div class="nav-item">🏠 Dashboard</div>
+        <div class="nav-item">📦 Inventory</div>
+        <div class="nav-item">🧪 Tests</div>
+        <div class="nav-item">🚚 Orders</div>
+        <div class="nav-item">⚙️ Settings</div>
+      </nav>
+      <div style="position:absolute;left:24px;bottom:28px;right:24px;">
+        <div class="small">Online support</div>
+        <div style="margin-top:8px" class="pill">Live — 24/7</div>
+      </div>
+    </aside>
+
+    <header class="top">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div style="font-weight:800;font-size:16px">Dashboard</div>
+        <div class="small">Overview</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <input id="search" placeholder="Search orders, items, tests" style="padding:8px 12px;border-radius:10px;border:none;background:rgba(255,255,255,0.02);color:#e6eef8;outline:none" />
+        <div class="pill">Welcome, Admin</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="grid">
+        <div class="card">
+          <h3>Active Orders</h3>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="stat" id="orders-count">32</div>
+              <div class="small">Orders currently in progress</div>
+            </div>
+            <div>
+              <canvas id="ordersSpark" class="spark"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Inventory Items</h3>
+          <div class="stat" id="inventory-count">482</div>
+          <div class="small">Total SKUs available</div>
+        </div>
+
+        <div class="card">
+          <h3>1-hour Tests Ready</h3>
+          <div class="stat" id="tests-count">8</div>
+          <div class="small">Estimated completion within 1 hour</div>
+        </div>
+
+        <div class="card wide">
+          <h3>Recent Orders</h3>
+          <table>
+            <thead>
+              <tr><th>Order #</th><th>Customer</th><th>Items</th><th>ETA</th><th>Status</th></tr>
+            </thead>
+            <tbody id="orders-table">
+              <!-- populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Quick Actions</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+            <button class="btn" onclick="createOrder()">Create Express Order</button>
+            <button class="pill" onclick="restockSamples()">Request Restock</button>
+            <button class="pill urgent" onclick="prioritizeTests()">Prioritize Tests (1-hour)</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Inventory Low</h3>
+          <ul id="low-list" style="margin:8px 0 0 0;padding-left:18px;color:var(--muted)"></ul>
+        </div>
+
+        <div class="card wide">
+          <h3>Performance</h3>
+          <div style="display:flex;gap:20px;align-items:center">
+            <div style="flex:1">
+              <canvas id="perfChart" width="600" height="180"></canvas>
+            </div>
+            <div style="width:220px">
+              <div class="small">Avg test turnaround</div>
+              <div style="font-size:22px;font-weight:800;margin-top:6px">45 min</div>
+              <div class="small" style="margin-top:10px">On-time rate: <strong id="ontime">92%</strong></div>
+              <div style="margin-top:12px"><a class="btn" href="#">View reports</a></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // sample dataset
+    const ORDERS = [
+      {id:'HM-1001',customer:'Rajesh K',items:3,eta:30,status:'in-progress'},
+      {id:'HM-1002',customer:'Anita P',items:1,eta:50,status:'queued'},
+      {id:'HM-1003',customer:'Clinic One',items:12,eta:20,status:'in-progress'},
+      {id:'HM-1004',customer:'Dr. Meera',items:2,eta:10,status:'dispatching'},
+      {id:'HM-1005',customer:'Vimal & Co',items:7,eta:75,status:'queued'},
+    ];
+
+    const LOW = ['Rapid Antigen Kit (2 left)','Glucose Strips (7)','Saline Pack (3)'];
+
+    function renderOrders(){
+      const tbody = document.getElementById('orders-table');
+      tbody.innerHTML='';
+      ORDERS.forEach(o=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${o.id}</td><td>${o.customer}</td><td>${o.items}</td><td>${o.eta} min</td><td><span class='pill'>${o.status}</span></td>`;
+        tbody.appendChild(tr);
+      });
+      document.getElementById('orders-count').innerText = ORDERS.length;
+    }
+
+    function renderLow(){
+      const ul = document.getElementById('low-list'); ul.innerHTML='';
+      LOW.forEach(it=>{const li=document.createElement('li');li.textContent=it;ul.appendChild(li)});
+      document.getElementById('inventory-count').innerText = 482;
+      document.getElementById('tests-count').innerText = ORDERS.filter(o=>o.status!=='queued').length;
+    }
+
+    // tiny sparkline for orders trend
+    function drawSpark(id, values){
+      const c = document.getElementById(id); if(!c) return; const ctx=c.getContext('2d'); const w=c.width=c.clientWidth; const h=c.height=60; ctx.clearRect(0,0,w,h);
+      const max=Math.max(...values); const min=Math.min(...values);
+      ctx.lineWidth=2; ctx.beginPath(); values.forEach((v,i)=>{const x = (i/(values.length-1))*(w-8)+4; const y = h - 6 - ((v-min)/(max-min||1))*(h-12); if(i==0) ctx.moveTo(x,y); else ctx.lineTo(x,y)});
+      ctx.strokeStyle='rgba(255,200,87,0.95)'; ctx.stroke();
+    }
+
+    // performance chart (simple area)
+    function drawPerf(){
+      const c = document.getElementById('perfChart'); const ctx=c.getContext('2d'); const w=c.width; const h=c.height; ctx.clearRect(0,0,w,h);
+      const data = [60,55,50,45,40,42,38,45,47,44];
+      const max=Math.max(...data); const min=Math.min(...data);
+      ctx.beginPath(); data.forEach((v,i)=>{const x=(i/(data.length-1))*(w-20)+10; const y = h - 10 - ((v-min)/(max-min||1))*(h-20); if(i==0) ctx.moveTo(x,y); else ctx.lineTo(x,y)});
+      ctx.lineTo(w-10,h-10); ctx.lineTo(10,h-10); ctx.closePath();
+      ctx.fillStyle='rgba(123,211,137,0.12)'; ctx.fill(); ctx.strokeStyle='rgba(123,211,137,0.9)'; ctx.lineWidth=2; ctx.stroke();
+      // labels
+      ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.font='12px monospace'; ctx.fillText('Last 10 runs (min)',10,16);
+    }
+
+    // actions
+    function createOrder(){
+      const id = 'HM-'+(1000+Math.floor(Math.random()*9000)); ORDERS.unshift({id,customer:'Walk-in',items:1,eta:55,status:'queued'}); renderOrders(); renderLow(); drawSpark('ordersSpark',[5,8,12,10,18,14,22,32]);
+      alert('Express order '+id+' created — assigned to express queue');
+    }
+    function restockSamples(){ alert('Restock request sent to procurement'); }
+    function prioritizeTests(){ alert('Priority mode enabled — tests within 1 hour will be pushed ahead'); }
+
+    // init
+    renderOrders(); renderLow(); drawSpark('ordersSpark',[2,4,4,8,12,18,22,32]); drawPerf();
+  </script>
+</body>
+</html>
+            
